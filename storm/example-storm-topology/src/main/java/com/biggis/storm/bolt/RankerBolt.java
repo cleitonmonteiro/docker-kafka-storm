@@ -32,7 +32,7 @@ public class RankerBolt extends BaseRichBolt {
 
         rankerMap.put(word, count);
 
-        LOG.info(sortEntriesByCount(rankerMap).toString());
+        // LOG.info(sortEntriesByCount(rankerMap).toString());
         collector.ack(tuple);
     }
 

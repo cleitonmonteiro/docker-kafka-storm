@@ -1,7 +1,5 @@
 FROM ubuntu:14.04
 
-MAINTAINER wipatrick
-
 ENV ZK_VERSION='3.4.6'
 
 RUN apt-get update \

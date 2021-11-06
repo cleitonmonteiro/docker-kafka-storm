@@ -1,9 +1,7 @@
-FROM maven:openjdk:12-jdk
-
-MAINTAINER wipatrick
+FROM maven:3.8.3-jdk-8
 
 RUN apt-get update && \
-    apt-get install -y unzip wget
+    apt-get install -y unzip wget python
 
 RUN wget -q -O - https://archive.apache.org/dist/storm/apache-storm-0.9.4/apache-storm-0.9.4.tar.gz | tar -xzf - -C /opt
 

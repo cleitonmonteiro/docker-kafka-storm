@@ -3,8 +3,7 @@ zookeeper:
   restart: always
   ports:
     - "2181:2181"
-  # volumes:
-  #   - ./backup/zookeeper:/tmp/zookeeper
+
 kafka:
   build: ./kafka/framework
   restart: always
@@ -12,6 +11,7 @@ kafka:
     - "9092:9092"
   links:
     - zookeeper:zookeeper
+
 nimbus:
   build: ./storm/framework/storm-nimbus
   restart: always
@@ -21,6 +21,7 @@ nimbus:
     - "6627:6627"
   links:
     - zookeeper:zk
+
 supervisor:
   build: ./storm/framework/storm-supervisor
   restart: always
@@ -29,6 +30,7 @@ supervisor:
   links:
     - nimbus:nimbus
     - zookeeper:zk
+
 stormui:
   build: ./storm/framework/storm-ui
   restart: always
@@ -37,3 +39,13 @@ stormui:
   links:
     - nimbus:nimbus
     - zookeeper:zk
+
+mongo:
+  build: ./mongo
+  restart: always
+  ports:
+    - "27017:27017"
+  environment:
+    MONGO_INITDB_ROOT_USERNAME: root
+    MONGO_INITDB_ROOT_PASSWORD: rootpass
+    MONGO_INITDB_DATABASE: mobile
