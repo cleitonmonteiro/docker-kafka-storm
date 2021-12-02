@@ -3,7 +3,7 @@
 case "$1" in
         initial)
             docker build -t=kafka-producer kafka/example-kafka-producer
-            docker build -t=storm-topology storm/example-storm-topology
+            docker build -t=storm-topology storm/mobile-geolocation
 
             docker-compose build
             ;;
@@ -13,7 +13,7 @@ case "$1" in
             ;;
 
         storm-topology)
-            docker build -t=storm-topology storm/example-storm-topology
+            docker build -t=storm-topology storm/mobile-geolocation
             ;;
 
         *)

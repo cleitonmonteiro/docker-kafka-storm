@@ -11,3 +11,8 @@ storm/example-storm-topology/.classpath
 storm/example-storm-topology/.project
 storm/example-storm-topology/.settings/
 storm/example-storm-topology/bin/
+
+storm/mobile-geolocation/.classpath
+storm/mobile-geolocation/.project
+storm/mobile-geolocation/.settings/
+storm/mobile-geolocation/bin/

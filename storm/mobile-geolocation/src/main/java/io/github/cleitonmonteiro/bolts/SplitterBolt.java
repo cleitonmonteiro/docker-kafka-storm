@@ -1,24 +1,20 @@
-package com.biggis.storm.bolt;
+package io.github.cleitonmonteiro.bolts;
 
-import backtype.storm.task.OutputCollector;
-import backtype.storm.task.TopologyContext;
-import backtype.storm.topology.OutputFieldsDeclarer;
-import backtype.storm.topology.base.BaseRichBolt;
-import backtype.storm.tuple.Fields;
-import backtype.storm.tuple.Tuple;
-import backtype.storm.tuple.Values;
-import com.biggis.storm.model.Location;
 import com.google.gson.Gson;
+import io.github.cleitonmonteiro.model.LocationModel;
+import org.apache.storm.task.OutputCollector;
+import org.apache.storm.task.TopologyContext;
+import org.apache.storm.topology.OutputFieldsDeclarer;
+import org.apache.storm.topology.base.BaseRichBolt;
+import org.apache.storm.tuple.Fields;
+import org.apache.storm.tuple.Tuple;
+import org.apache.storm.tuple.Values;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
-/**
- * SplitterBolt
- */
-public class SplitterBolt extends BaseRichBolt {
-
+public class SplitterBolt  extends BaseRichBolt {
     private static final Logger LOG = LoggerFactory.getLogger(SplitterBolt.class);
     private OutputCollector collector;
 
@@ -35,11 +31,11 @@ public class SplitterBolt extends BaseRichBolt {
             Gson gson = new Gson();
             String locationJSON = tuple.getString(0);
             String message = tuple.getStringByField("message");
-            Location location = gson.fromJson(locationJSON, Location.class);
+            LocationModel location = gson.fromJson(locationJSON, LocationModel.class);
 
-            LOG.info("SplitterBolt -> provider" + location.provider);
+//            LOG.info("SplitterBolt -> provider" + location.provider);
             LOG.info("SplitterBolt -> message" + message);
-            LOG.info("SplitterBolt -> latitude" + location.latitude);
+            LOG.info("SplitterBolt -> latitude" + location.getLatitude());
 
         } catch (Exception e) {
             LOG.info(e.getMessage());

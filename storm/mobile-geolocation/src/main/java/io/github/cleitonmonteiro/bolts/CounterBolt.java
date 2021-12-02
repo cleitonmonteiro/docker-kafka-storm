@@ -1,38 +1,32 @@
-package com.biggis.storm.bolt;
+package io.github.cleitonmonteiro.bolts;
 
-import backtype.storm.task.OutputCollector;
-import backtype.storm.task.TopologyContext;
-import backtype.storm.topology.OutputFieldsDeclarer;
-import backtype.storm.topology.base.BaseRichBolt;
-import backtype.storm.tuple.Fields;
-import backtype.storm.tuple.Tuple;
-import backtype.storm.tuple.Values;
-import com.mongodb.*;
+import com.mongodb.MongoClient;
+import org.apache.storm.task.OutputCollector;
+import org.apache.storm.task.TopologyContext;
+import org.apache.storm.topology.OutputFieldsDeclarer;
+import org.apache.storm.topology.base.BaseRichBolt;
+import org.apache.storm.tuple.Fields;
+import org.apache.storm.tuple.Tuple;
+import org.apache.storm.tuple.Values;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * CounterBolt
- */
 public class CounterBolt extends BaseRichBolt {
-
     private static final Logger LOG = LoggerFactory.getLogger(CounterBolt.class);
     private OutputCollector collector ;
     private Map<String, Integer> counts;
-    private MongoClient mongoClient;
 
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
 
         this.collector = outputCollector;
         this.counts = new HashMap<String, Integer>();
         try {
-            mongoClient = new MongoClient();
+            MongoClient mongoClient = new MongoClient();
             LOG.info("============================ \n\n\n Connected on mongodb! \n\n\n ================================");
-        } catch (UnknownHostException e) {
+        } catch (Exception e) {
             LOG.info("Cannot connect to mongodb!");
             e.printStackTrace();
         }
@@ -40,7 +34,9 @@ public class CounterBolt extends BaseRichBolt {
 
     public void execute(Tuple tuple) {
 
-        String word = tuple.getStringByField("word");
+        LOG.info("CounterBolt -> Tuple: " + tuple.toString());
+
+        String word = tuple.getStringByField("message");
 
         Integer count = counts.get(word);
         if (count == null){
@@ -49,14 +45,6 @@ public class CounterBolt extends BaseRichBolt {
         count++;
 
         counts.put(word, count);
-//        DB database = mongoClient.getDB("mobile");
-//
-//        DBObject wordObj = new BasicDBObject("_id", word)
-//                .append("count", count.toString());
-//        DBCollection collection = database.getCollection("words");
-//        collection.insert(wordObj);
-        // LOG.info(word);
-        // LOG.info("Received problem: " + word);
         collector .emit(tuple, new Values(word, count));
         collector .ack(tuple);
     }
