@@ -2,6 +2,7 @@ package io.github.cleitonmonteiro;
 
 import io.github.cleitonmonteiro.bolts.CounterBolt;
 import io.github.cleitonmonteiro.bolts.LocationBolt;
+import io.github.cleitonmonteiro.bolts.NotifierBolt;
 import org.apache.storm.Config;
 import org.apache.storm.StormSubmitter;
 import org.apache.storm.generated.StormTopology;
@@ -40,7 +41,7 @@ public class MainTopology {
 
         builder.setSpout(KAFKA_SPOUT_ID, new KafkaSpout(kafkaConf));
         builder.setBolt(LOCATION_BOLT_ID, new LocationBolt(), 4).shuffleGrouping(KAFKA_SPOUT_ID);
-        builder.setBolt(NOTIFIER_BOLT_ID, new CounterBolt(), 4).fieldsGrouping(LOCATION_BOLT_ID, new Fields("notification"));
+        builder.setBolt(NOTIFIER_BOLT_ID, new NotifierBolt(), 4).fieldsGrouping(LOCATION_BOLT_ID, new Fields("notification"));
         // builder.setBolt(RANKER_BOLT_ID, new RankerBolt()).globalGrouping(COUNTER_BOLT_ID);
 
         return builder.createTopology();
