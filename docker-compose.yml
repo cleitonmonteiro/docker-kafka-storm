@@ -43,6 +43,8 @@ stormui:
 mongo:
   build: ./mongo
   restart: always
+  volumes:
+    - ./data/db
   ports:
     - "27017:27017"
   environment:
