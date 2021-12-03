@@ -1,20 +1,20 @@
 package io.github.cleitonmonteiro.model;
 
+import org.bson.types.ObjectId;
+
 public class LocationKafkaMessage extends LocationModel {
     private String provider;
     private double accuracy;
     private double timestamp;
-    private String mobileId;
+    private ObjectId mobileId;
 
     @Override
     public String toString() {
         return "LocationKafkaMessage{" +
-                "provider='" + getProvider() + '\'' +
-                ", accuracy=" + getAccuracy() +
-                ", timestamp=" + getTimestamp() +
-                ", mobileId='" + getMobileId() + '\'' +
-                ", latitude=" + getLatitude() +
-                ", longitude=" + getLongitude() +
+                "provider='" + provider + '\'' +
+                ", accuracy=" + accuracy +
+                ", timestamp=" + timestamp +
+                ", mobileId=" + mobileId +
                 '}';
     }
 
@@ -42,11 +42,11 @@ public class LocationKafkaMessage extends LocationModel {
         this.timestamp = timestamp;
     }
 
-    public String getMobileId() {
+    public ObjectId getMobileId() {
         return mobileId;
     }
 
-    public void setMobileId(String mobileId) {
+    public void setMobileId(ObjectId mobileId) {
         this.mobileId = mobileId;
     }
 }

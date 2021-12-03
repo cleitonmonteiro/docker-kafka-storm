@@ -1,7 +1,7 @@
 package io.github.cleitonmonteiro;
 
 import io.github.cleitonmonteiro.bolts.CounterBolt;
-import io.github.cleitonmonteiro.bolts.SplitterBolt;
+import io.github.cleitonmonteiro.bolts.LocationBolt;
 import org.apache.storm.Config;
 import org.apache.storm.StormSubmitter;
 import org.apache.storm.generated.StormTopology;
@@ -16,8 +16,9 @@ import java.util.Arrays;
 
 public class MainTopology {
     private static final Logger LOG = LoggerFactory.getLogger(MainTopology.class);
-    private static final String KAFKA_SPOUT_ID = "kafka-spout";
-    private static final String SPLITTER_BOLT_ID = "splitter-bolt";
+    private static final String KAFKA_SPOUT_ID = "KAFKA_SPOUT_ID";
+    private static final String LOCATION_BOLT_ID = "LOCATION_BOLT_ID";
+    private static final String NOTIFIER_BOLT_ID = "NOTIFIER_BOLT_ID";
     private static final String COUNTER_BOLT_ID = "counter-bolt";
     private BrokerHosts brokerHosts;
 
@@ -38,8 +39,8 @@ public class MainTopology {
         TopologyBuilder builder = new TopologyBuilder();
 
         builder.setSpout(KAFKA_SPOUT_ID, new KafkaSpout(kafkaConf));
-        builder.setBolt(SPLITTER_BOLT_ID, new SplitterBolt(), 4).shuffleGrouping(KAFKA_SPOUT_ID);
-        builder.setBolt(COUNTER_BOLT_ID, new CounterBolt(), 4).fieldsGrouping(SPLITTER_BOLT_ID, new Fields("word"));
+        builder.setBolt(LOCATION_BOLT_ID, new LocationBolt(), 4).shuffleGrouping(KAFKA_SPOUT_ID);
+        builder.setBolt(NOTIFIER_BOLT_ID, new CounterBolt(), 4).fieldsGrouping(LOCATION_BOLT_ID, new Fields("notification"));
         // builder.setBolt(RANKER_BOLT_ID, new RankerBolt()).globalGrouping(COUNTER_BOLT_ID);
 
         return builder.createTopology();

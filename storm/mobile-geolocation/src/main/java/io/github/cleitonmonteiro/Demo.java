@@ -14,6 +14,7 @@ import io.github.cleitonmonteiro.model.SubscriptionModel;
 import org.bson.codecs.configuration.CodecRegistries;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.codecs.pojo.PojoCodecProvider;
+import org.bson.types.ObjectId;
 
 public class Demo {
 
@@ -39,7 +40,7 @@ public class Demo {
             locationKafkaMessage.setLongitude(-37.770139);
             locationKafkaMessage.setAccuracy(10.0);
             locationKafkaMessage.setProvider("FUSED");
-            locationKafkaMessage.setMobileId("61a82b333ebb7d3bafde8ac5");
+            locationKafkaMessage.setMobileId(new ObjectId(("61a96fa12c99606a8f7de148")));
 
             BasicDBObject searchQuery = new BasicDBObject();
             searchQuery.put("mobileId", locationKafkaMessage.getMobileId());
