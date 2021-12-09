@@ -15,6 +15,7 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import io.github.cleitonmonteiro.helper.GeolocationHelper;
+import io.github.cleitonmonteiro.helper.GsonHelper;
 import io.github.cleitonmonteiro.model.LocationKafkaMessage;
 import io.github.cleitonmonteiro.model.LocationModel;
 import io.github.cleitonmonteiro.model.SubscriptionModel;
@@ -90,8 +91,9 @@ public class LocationBolt  extends BaseRichBolt {
 
     public void execute(Tuple tuple) {
         try {
-            Gson gson = new Gson();
+            Gson gson = GsonHelper.instance();
             String locationJSON = tuple.getString(0);
+            LOG.info(String.format("JSON: %s", locationJSON));
             LocationKafkaMessage locationKafkaMessage = gson.fromJson(locationJSON, LocationKafkaMessage.class);
             processMobileCoordinate(tuple, locationKafkaMessage);
         } catch (Exception e) {
