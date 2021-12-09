@@ -6,6 +6,7 @@
 # NIMBUS_THRIFT_PORT="$( echo $(docker exec -it docker-kafka-storm_supervisor_1 /bin/bash -c "env | grep NIMBUS_PORT_6627_TCP_PORT") | awk -F'=' '{print $NF}' | sed 's/[^0-9]//g')"
 
 ZK_HOST=$(docker inspect --format '{{ .NetworkSettings.IPAddress }}' docker-kafka-storm_zookeeper_1)
+MONGO_HOST=$(docker inspect --format '{{ .NetworkSettings.IPAddress }}' docker-kafka-storm_mongo_1)
 NIMBUS_HOST=$(docker inspect --format '{{ .NetworkSettings.IPAddress }}' docker-kafka-storm_nimbus_1)
 
 # Only works for container ports, that are mapped/exposed on the Host
@@ -18,6 +19,7 @@ docker run -it --rm \
         -e TOPIC=$3 \
         -e ZK_HOST=${ZK_HOST} \
         -e ZK_PORT=${ZK_PORT} \
+        -e MONGO_HOST=${MONGO_HOST} \
         -e NIMBUS_HOST=${NIMBUS_HOST} \
         -e NIMBUS_THRIFT_PORT=${NIMBUS_THRIFT_PORT} \
         --name topology \

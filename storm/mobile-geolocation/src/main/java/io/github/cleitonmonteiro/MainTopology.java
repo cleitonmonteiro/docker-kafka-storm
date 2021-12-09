@@ -1,17 +1,17 @@
 package io.github.cleitonmonteiro;
 
-import io.github.cleitonmonteiro.bolts.CounterBolt;
+import backtype.storm.LocalCluster;
+import backtype.storm.StormSubmitter;
+import backtype.storm.generated.StormTopology;
+import backtype.storm.spout.SchemeAsMultiScheme;
+import backtype.storm.topology.TopologyBuilder;
+import backtype.storm.Config;
+import backtype.storm.tuple.Fields;
 import io.github.cleitonmonteiro.bolts.LocationBolt;
 import io.github.cleitonmonteiro.bolts.NotifierBolt;
-import org.apache.storm.Config;
-import org.apache.storm.StormSubmitter;
-import org.apache.storm.generated.StormTopology;
-import org.apache.storm.kafka.*;
-import org.apache.storm.spout.SchemeAsMultiScheme;
-import org.apache.storm.topology.TopologyBuilder;
-import org.apache.storm.tuple.Fields;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import storm.kafka.*;
 
 import java.util.Arrays;
 
@@ -20,7 +20,6 @@ public class MainTopology {
     private static final String KAFKA_SPOUT_ID = "KAFKA_SPOUT_ID";
     private static final String LOCATION_BOLT_ID = "LOCATION_BOLT_ID";
     private static final String NOTIFIER_BOLT_ID = "NOTIFIER_BOLT_ID";
-    private static final String COUNTER_BOLT_ID = "counter-bolt";
     private BrokerHosts brokerHosts;
 
     public MainTopology(String ZK_HOST, String ZK_PORT) {
@@ -32,7 +31,7 @@ public class MainTopology {
      *
      * @return      StormTopology Object
      */
-    public StormTopology buildTopology(String TOPIC) {
+    public StormTopology buildTopology(String TOPIC, String MONGO_HOST) {
 
         SpoutConfig kafkaConf = new SpoutConfig(brokerHosts, TOPIC, "", "storm");
         kafkaConf.scheme = new SchemeAsMultiScheme(new StringScheme());
@@ -40,9 +39,8 @@ public class MainTopology {
         TopologyBuilder builder = new TopologyBuilder();
 
         builder.setSpout(KAFKA_SPOUT_ID, new KafkaSpout(kafkaConf));
-        builder.setBolt(LOCATION_BOLT_ID, new LocationBolt(), 4).shuffleGrouping(KAFKA_SPOUT_ID);
-        builder.setBolt(NOTIFIER_BOLT_ID, new NotifierBolt(), 4).fieldsGrouping(LOCATION_BOLT_ID, new Fields("notification"));
-        // builder.setBolt(RANKER_BOLT_ID, new RankerBolt()).globalGrouping(COUNTER_BOLT_ID);
+        builder.setBolt(LOCATION_BOLT_ID, new LocationBolt(MONGO_HOST), 4).shuffleGrouping(KAFKA_SPOUT_ID);
+        builder.setBolt(NOTIFIER_BOLT_ID, new NotifierBolt(MONGO_HOST), 4).fieldsGrouping(LOCATION_BOLT_ID, new Fields("notification"));
 
         return builder.createTopology();
     }
@@ -67,17 +65,18 @@ public class MainTopology {
             String TOPIC = args[3];
             String NIMBUS_HOST = args[4];
             int NIMBUS_THRIFT_PORT = Integer.parseInt(args[5]);
+            String MONGO_HOST = args[6];
 
             conf.setDebug(false);
             conf.setNumWorkers(2);
             conf.setMaxTaskParallelism(5);
-            // conf.put(Config.NIMBUS_HOST, NIMBUS_HOST);
+            conf.put(Config.NIMBUS_HOST, NIMBUS_HOST);
             conf.put(Config.NIMBUS_THRIFT_PORT, NIMBUS_THRIFT_PORT);
             conf.put(Config.STORM_ZOOKEEPER_PORT, ZK_PORT);
             conf.put(Config.STORM_ZOOKEEPER_SERVERS, Arrays.asList(ZK_HOST));
 
             MainTopology wordCountTopology = new MainTopology(ZK_HOST, String.valueOf(ZK_PORT));
-            StormSubmitter.submitTopology(TOPOLOGY_NAME, conf, wordCountTopology.buildTopology(TOPIC));
+            StormSubmitter.submitTopology(TOPOLOGY_NAME, conf, wordCountTopology.buildTopology(TOPIC, MONGO_HOST));
         } else {
             LOG.info("Please pass all the args to topology");
         }

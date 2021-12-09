@@ -1,24 +1,14 @@
 package io.github.cleitonmonteiro.bolts;
 
+import backtype.storm.task.OutputCollector;
+import backtype.storm.task.TopologyContext;
+import backtype.storm.topology.OutputFieldsDeclarer;
+import backtype.storm.topology.base.BaseRichBolt;
+import backtype.storm.tuple.Tuple;
 import com.google.gson.Gson;
-import com.mongodb.BasicDBObject;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
-import io.github.cleitonmonteiro.helper.GeolocationHelper;
-import io.github.cleitonmonteiro.model.LocationKafkaMessage;
-import io.github.cleitonmonteiro.model.LocationModel;
-import io.github.cleitonmonteiro.model.NotificationModel;
-import io.github.cleitonmonteiro.model.SubscriptionModel;
-import org.apache.storm.task.OutputCollector;
-import org.apache.storm.task.TopologyContext;
-import org.apache.storm.topology.OutputFieldsDeclarer;
-import org.apache.storm.topology.base.BaseRichBolt;
-import org.apache.storm.tuple.Fields;
-import org.apache.storm.tuple.Tuple;
-import org.apache.storm.tuple.Values;
 import org.bson.codecs.configuration.CodecRegistries;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.codecs.pojo.PojoCodecProvider;
@@ -32,11 +22,16 @@ public class NotifierBolt extends BaseRichBolt {
     private OutputCollector collector;
     private MongoDatabase mobileDatabase;
     private CodecRegistry pojoCodecRegistry;
+    private String mongoHost;
+
+    public NotifierBolt(String mongoHost) {
+        this.mongoHost = mongoHost;
+    }
 
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
         this.collector = outputCollector;
         try {
-            MongoClientURI mongoClientURI = new MongoClientURI("mongodb://root:rootpass@localhost:27017/mobile?authSource=admin");
+            MongoClientURI mongoClientURI = new MongoClientURI(String.format("mongodb://root:rootpass@%s:27017/mobile?authSource=admin", mongoHost));
             MongoClient mongoClient = new MongoClient(mongoClientURI);
             mobileDatabase = mongoClient.getDatabase("mobile");
             PojoCodecProvider codecProvider = PojoCodecProvider.builder()

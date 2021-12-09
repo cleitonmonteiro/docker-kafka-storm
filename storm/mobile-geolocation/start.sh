@@ -2,7 +2,7 @@
 
 case "$1" in
         submit)
-            /usr/bin/storm jar target/mobile-geolocation-1.0-SNAPSHOT-jar-with-dependencies.jar ${MAINCLASS} ${TOPOLOGY_NAME} ${ZK_HOST} ${ZK_PORT} ${TOPIC} ${NIMBUS_HOST} ${NIMBUS_THRIFT_PORT}
+            /usr/bin/storm jar target/mobile-geolocation-1.0-SNAPSHOT-jar-with-dependencies.jar ${MAINCLASS} ${TOPOLOGY_NAME} ${ZK_HOST} ${ZK_PORT} ${TOPIC} ${NIMBUS_HOST} ${NIMBUS_THRIFT_PORT} ${MONGO_HOST}
             ;;
 
         kill)

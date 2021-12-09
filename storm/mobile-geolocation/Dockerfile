@@ -3,9 +3,9 @@ FROM maven:3.8.3-jdk-8
 RUN apt-get update && \
     apt-get install -y unzip wget python
 
-RUN wget -q -O - https://archive.apache.org/dist/storm/apache-storm-2.2.0/apache-storm-2.2.0.tar.gz | tar -xzf - -C /opt
+RUN wget -q -O - https://archive.apache.org/dist/storm/apache-storm-0.9.4/apache-storm-0.9.4.tar.gz | tar -xzf - -C /opt
 
-ENV STORM_HOME /opt/apache-storm-2.2.0
+ENV STORM_HOME /opt/apache-storm-0.9.4
 
 RUN groupadd storm; useradd --gid storm --home-dir /home/storm --create-home --shell /bin/bash storm; chown -R storm:storm $STORM_HOME; mkdir /var/log/storm ; chown -R storm:storm /var/log/storm
 RUN ln -s $STORM_HOME/bin/storm /usr/bin/storm
