@@ -31,7 +31,7 @@ public class MainTopology {
      *
      * @return      StormTopology Object
      */
-    public StormTopology buildTopology(String TOPIC, String MONGO_HOST) {
+    public StormTopology buildTopology(String TOPIC, String mongoHost, String kafkaIP) {
 
         SpoutConfig kafkaConf = new SpoutConfig(brokerHosts, TOPIC, "", "storm");
         kafkaConf.scheme = new SchemeAsMultiScheme(new StringScheme());
@@ -39,8 +39,8 @@ public class MainTopology {
         TopologyBuilder builder = new TopologyBuilder();
 
         builder.setSpout(KAFKA_SPOUT_ID, new KafkaSpout(kafkaConf));
-        builder.setBolt(LOCATION_BOLT_ID, new LocationBolt(MONGO_HOST), 4).shuffleGrouping(KAFKA_SPOUT_ID);
-        builder.setBolt(NOTIFIER_BOLT_ID, new NotifierBolt(MONGO_HOST), 4).fieldsGrouping(LOCATION_BOLT_ID, new Fields("notification"));
+        builder.setBolt(LOCATION_BOLT_ID, new LocationBolt(mongoHost), 4).shuffleGrouping(KAFKA_SPOUT_ID);
+        builder.setBolt(NOTIFIER_BOLT_ID, new NotifierBolt(mongoHost , kafkaIP), 4).fieldsGrouping(LOCATION_BOLT_ID, new Fields("notification"));
 
         return builder.createTopology();
     }
@@ -65,7 +65,10 @@ public class MainTopology {
             String TOPIC = args[3];
             String NIMBUS_HOST = args[4];
             int NIMBUS_THRIFT_PORT = Integer.parseInt(args[5]);
-            String MONGO_HOST = args[6];
+            String mongoHost = args[6];
+
+            String KAFKA_BROKER_HOST = args[7];
+            String KAFKA_BROKER_PORT = args[8];
 
             conf.setDebug(false);
             conf.setNumWorkers(2);
@@ -76,7 +79,7 @@ public class MainTopology {
             conf.put(Config.STORM_ZOOKEEPER_SERVERS, Arrays.asList(ZK_HOST));
 
             MainTopology wordCountTopology = new MainTopology(ZK_HOST, String.valueOf(ZK_PORT));
-            StormSubmitter.submitTopology(TOPOLOGY_NAME, conf, wordCountTopology.buildTopology(TOPIC, MONGO_HOST));
+            StormSubmitter.submitTopology(TOPOLOGY_NAME, conf, wordCountTopology.buildTopology(TOPIC, mongoHost, KAFKA_BROKER_HOST + ":" + KAFKA_BROKER_PORT));
         } else {
             LOG.info("Please pass all the args to topology");
         }

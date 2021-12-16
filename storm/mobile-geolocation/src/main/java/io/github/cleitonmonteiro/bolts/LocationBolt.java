@@ -18,10 +18,12 @@ import io.github.cleitonmonteiro.helper.GeolocationHelper;
 import io.github.cleitonmonteiro.helper.GsonHelper;
 import io.github.cleitonmonteiro.model.LocationKafkaMessage;
 import io.github.cleitonmonteiro.model.LocationModel;
+import io.github.cleitonmonteiro.model.NotificationModel;
 import io.github.cleitonmonteiro.model.SubscriptionModel;
 import org.bson.codecs.configuration.CodecRegistries;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.codecs.pojo.PojoCodecProvider;
+import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,20 +66,17 @@ public class LocationBolt  extends BaseRichBolt {
                 while (cursor.hasNext()) {
                     SubscriptionModel currentSub = cursor.next();
                     double distance = GeolocationHelper.distanceBetween(locationKafkaMessage, new LocationModel(currentSub.getLatitude(), currentSub.getLongitude()));
-                    System.out.println(currentSub.toString());
-                    System.out.println("Distance: " + distance);
+                    NotificationModel notification;
 
                     if (distance <= currentSub.getDistanceToNotifier()) {
-                        System.out.println("Notifier by distance");
-//                        collector.emit(tuple, new Values(new NotificationModel(currentSub.getUserId(), currentSub.getMobileId(), false)));
-                        collector.emit(tuple, new Values("Notifier by distance"));
+                        notification = new NotificationModel(currentSub.getUserId(), currentSub.getMobileId(), false);
+                        collector.emit(tuple, new Values(notification));
                         collector.ack(tuple);
                     }
 
                     if (currentSub.isTrack()) {
-                        System.out.println("Notifier by track");
-//                        collector.emit(tuple, new Values(new NotificationModel(currentSub.getUserId(), currentSub.getMobileId(), true)));
-                        collector.emit(tuple, new Values("Notifier by track"));
+                        notification = new NotificationModel(currentSub.getUserId(), currentSub.getMobileId(), true);
+                        collector.emit(tuple, new Values(notification));
                         collector.ack(tuple);
                     }
                 }

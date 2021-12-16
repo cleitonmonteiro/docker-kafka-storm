@@ -1,6 +1,8 @@
 package io.github.cleitonmonteiro.model;
 
-public class LocationModel {
+import java.io.Serializable;
+
+public class LocationModel implements Serializable {
     private double latitude;
     private double longitude;
 
