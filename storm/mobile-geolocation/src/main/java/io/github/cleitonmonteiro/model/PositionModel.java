@@ -2,14 +2,14 @@ package io.github.cleitonmonteiro.model;
 
 import java.io.Serializable;
 
-public class LocationModel implements Serializable {
+public class PositionModel implements Serializable {
     private double latitude;
     private double longitude;
 
-    public LocationModel() {
+    public PositionModel() {
         super();
     }
-    public LocationModel(double latitude, double longitude) {
+    public PositionModel(double latitude, double longitude) {
         this.setLatitude(latitude);
         this.setLongitude(longitude);
     }

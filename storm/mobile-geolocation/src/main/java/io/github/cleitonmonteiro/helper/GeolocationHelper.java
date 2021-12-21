@@ -1,10 +1,10 @@
 package io.github.cleitonmonteiro.helper;
 
-import io.github.cleitonmonteiro.model.LocationModel;
+import io.github.cleitonmonteiro.model.PositionModel;
 
 public class GeolocationHelper {
     // Return the distance in meters.
-    public static double distanceBetween(LocationModel start, LocationModel end) {
+    public static double distanceBetween(PositionModel start, PositionModel end) {
         double earthRadius = 6378137.0;
         double dLat = _toRadians(end.getLatitude() - start.getLatitude());
         double dLon = _toRadians(end.getLongitude() - start.getLongitude());

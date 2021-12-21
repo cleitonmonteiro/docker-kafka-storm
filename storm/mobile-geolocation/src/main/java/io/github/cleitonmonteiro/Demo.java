@@ -7,8 +7,8 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import io.github.cleitonmonteiro.helper.GeolocationHelper;
-import io.github.cleitonmonteiro.model.LocationKafkaMessage;
-import io.github.cleitonmonteiro.model.LocationModel;
+import io.github.cleitonmonteiro.model.PositionKafkaMessage;
+import io.github.cleitonmonteiro.model.PositionModel;
 import io.github.cleitonmonteiro.model.MobileModel;
 import io.github.cleitonmonteiro.model.SubscriptionModel;
 import org.bson.codecs.configuration.CodecRegistries;
@@ -35,7 +35,7 @@ public class Demo {
             MongoCollection<SubscriptionModel> subscriptionsCollection = database.withCodecRegistry(pojoCodecRegistry).getCollection("subscriptions", SubscriptionModel.class);
             MongoCollection<MobileModel> mobileCollection = database.withCodecRegistry(pojoCodecRegistry).getCollection("mobiles", MobileModel.class);
 
-            LocationKafkaMessage locationKafkaMessage = new LocationKafkaMessage();
+            PositionKafkaMessage locationKafkaMessage = new PositionKafkaMessage();
             locationKafkaMessage.setLatitude(-4.560945);
             locationKafkaMessage.setLongitude(-37.770139);
             locationKafkaMessage.setAccuracy(10.0);
@@ -49,7 +49,7 @@ public class Demo {
             try {
                 while (cursor.hasNext()) {
                     SubscriptionModel current = cursor.next();
-                    double distance = GeolocationHelper.distanceBetween(locationKafkaMessage, new LocationModel(current.getLatitude(), current.getLongitude()));
+                    double distance = GeolocationHelper.distanceBetween(locationKafkaMessage, new PositionModel(current.getLatitude(), current.getLongitude()));
                     System.out.println(current.toString());
                     System.out.println("Distance: " + distance);
                     if (distance <= current.getDistanceToNotifier()) {

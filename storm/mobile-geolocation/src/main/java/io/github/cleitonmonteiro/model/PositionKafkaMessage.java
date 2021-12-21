@@ -2,7 +2,7 @@ package io.github.cleitonmonteiro.model;
 
 import org.bson.types.ObjectId;
 
-public class LocationKafkaMessage extends LocationModel {
+public class PositionKafkaMessage extends PositionModel {
     private String provider;
     private double accuracy;
     private double timestamp;

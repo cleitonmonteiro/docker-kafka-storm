@@ -2,17 +2,20 @@ package io.github.cleitonmonteiro.model;
 
 import org.bson.types.ObjectId;
 
-public class NotificationModel {
-    private ObjectId userId;
+import java.io.Serializable;
 
-    public NotificationModel(ObjectId userId, ObjectId mobileId, boolean fromTrack) {
+public class NotificationModel implements Serializable {
+    private ObjectId userId;
+    private ObjectId mobileId;
+    private boolean fromTrack;
+    private PositionModel position;
+
+    public NotificationModel(ObjectId userId, ObjectId mobileId, boolean fromTrack, PositionModel position) {
         this.userId = userId;
         this.mobileId = mobileId;
         this.fromTrack = fromTrack;
+        this.position = position;
     }
-
-    private ObjectId mobileId;
-    private boolean fromTrack;
 
     @Override
     public String toString() {
@@ -45,5 +48,13 @@ public class NotificationModel {
 
     public void setFromTrack(boolean fromTrack) {
         this.fromTrack = fromTrack;
+    }
+
+    public PositionModel getPosition() {
+        return position;
+    }
+
+    public void setPosition(PositionModel position) {
+        this.position = position;
     }
 }

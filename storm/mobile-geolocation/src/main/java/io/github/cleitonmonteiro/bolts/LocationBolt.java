@@ -16,14 +16,13 @@ import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import io.github.cleitonmonteiro.helper.GeolocationHelper;
 import io.github.cleitonmonteiro.helper.GsonHelper;
-import io.github.cleitonmonteiro.model.LocationKafkaMessage;
-import io.github.cleitonmonteiro.model.LocationModel;
+import io.github.cleitonmonteiro.model.PositionKafkaMessage;
+import io.github.cleitonmonteiro.model.PositionModel;
 import io.github.cleitonmonteiro.model.NotificationModel;
 import io.github.cleitonmonteiro.model.SubscriptionModel;
 import org.bson.codecs.configuration.CodecRegistries;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.codecs.pojo.PojoCodecProvider;
-import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,7 +55,7 @@ public class LocationBolt  extends BaseRichBolt {
         }
     }
 
-    private void processMobileCoordinate(Tuple tuple, LocationKafkaMessage locationKafkaMessage) {
+    private void processMobileCoordinate(Tuple tuple, PositionKafkaMessage locationKafkaMessage) {
         if (mobileDatabase != null) {
             MongoCollection<SubscriptionModel> subscriptionsCollection = mobileDatabase.withCodecRegistry(pojoCodecRegistry).getCollection("subscriptions", SubscriptionModel.class);
             BasicDBObject searchQuery = new BasicDBObject();
@@ -65,17 +64,18 @@ public class LocationBolt  extends BaseRichBolt {
             try {
                 while (cursor.hasNext()) {
                     SubscriptionModel currentSub = cursor.next();
-                    double distance = GeolocationHelper.distanceBetween(locationKafkaMessage, new LocationModel(currentSub.getLatitude(), currentSub.getLongitude()));
+                    PositionModel mobilePosition = new PositionModel(currentSub.getLatitude(), currentSub.getLongitude());
+                    double distance = GeolocationHelper.distanceBetween(locationKafkaMessage, mobilePosition);
                     NotificationModel notification;
 
                     if (distance <= currentSub.getDistanceToNotifier()) {
-                        notification = new NotificationModel(currentSub.getUserId(), currentSub.getMobileId(), false);
+                        notification = new NotificationModel(currentSub.getUserId(), currentSub.getMobileId(), false, mobilePosition);
                         collector.emit(tuple, new Values(notification));
                         collector.ack(tuple);
                     }
 
                     if (currentSub.isTrack()) {
-                        notification = new NotificationModel(currentSub.getUserId(), currentSub.getMobileId(), true);
+                        notification = new NotificationModel(currentSub.getUserId(), currentSub.getMobileId(), true, mobilePosition);
                         collector.emit(tuple, new Values(notification));
                         collector.ack(tuple);
                     }
@@ -93,7 +93,7 @@ public class LocationBolt  extends BaseRichBolt {
             Gson gson = GsonHelper.instance();
             String locationJSON = tuple.getString(0);
             LOG.info(String.format("JSON: %s", locationJSON));
-            LocationKafkaMessage locationKafkaMessage = gson.fromJson(locationJSON, LocationKafkaMessage.class);
+            PositionKafkaMessage locationKafkaMessage = gson.fromJson(locationJSON, PositionKafkaMessage.class);
             processMobileCoordinate(tuple, locationKafkaMessage);
         } catch (Exception e) {
             LOG.info(e.getMessage());
