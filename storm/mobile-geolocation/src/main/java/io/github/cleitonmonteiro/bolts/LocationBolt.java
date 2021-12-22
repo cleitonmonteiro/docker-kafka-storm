@@ -64,18 +64,19 @@ public class LocationBolt  extends BaseRichBolt {
             try {
                 while (cursor.hasNext()) {
                     SubscriptionModel currentSub = cursor.next();
-                    PositionModel mobilePosition = new PositionModel(currentSub.getLatitude(), currentSub.getLongitude());
-                    double distance = GeolocationHelper.distanceBetween(locationKafkaMessage, mobilePosition);
+                    PositionModel subPosition = new PositionModel(currentSub.getLatitude(), currentSub.getLongitude());
+                    double distance = GeolocationHelper.distanceBetween(locationKafkaMessage, subPosition);
+                    LOG.info("Distance: " + distance);
                     NotificationModel notification;
 
                     if (distance <= currentSub.getDistanceToNotifier()) {
-                        notification = new NotificationModel(currentSub.getUserId(), currentSub.getMobileId(), false, mobilePosition);
+                        notification = new NotificationModel(currentSub.getUserId(), currentSub.getMobileId(), false, locationKafkaMessage);
                         collector.emit(tuple, new Values(notification));
                         collector.ack(tuple);
                     }
 
                     if (currentSub.isTrack()) {
-                        notification = new NotificationModel(currentSub.getUserId(), currentSub.getMobileId(), true, mobilePosition);
+                        notification = new NotificationModel(currentSub.getUserId(), currentSub.getMobileId(), true, locationKafkaMessage);
                         collector.emit(tuple, new Values(notification));
                         collector.ack(tuple);
                     }

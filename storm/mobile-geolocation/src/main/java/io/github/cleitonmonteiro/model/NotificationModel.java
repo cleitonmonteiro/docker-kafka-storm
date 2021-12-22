@@ -8,13 +8,15 @@ public class NotificationModel implements Serializable {
     private ObjectId userId;
     private ObjectId mobileId;
     private boolean fromTrack;
-    private PositionModel position;
+    private double latitude;
+    private double longitude;
 
     public NotificationModel(ObjectId userId, ObjectId mobileId, boolean fromTrack, PositionModel position) {
         this.userId = userId;
         this.mobileId = mobileId;
         this.fromTrack = fromTrack;
-        this.position = position;
+        this.latitude = position.getLatitude();
+        this.longitude = position.getLongitude();
     }
 
     @Override
@@ -23,6 +25,8 @@ public class NotificationModel implements Serializable {
                 "userId=" + userId +
                 ", mobileId=" + mobileId +
                 ", fromTrack=" + fromTrack +
+                ", latitude=" + latitude +
+                ", longitude=" + longitude +
                 '}';
     }
 
@@ -50,11 +54,19 @@ public class NotificationModel implements Serializable {
         this.fromTrack = fromTrack;
     }
 
-    public PositionModel getPosition() {
-        return position;
+    public double getLongitude() {
+        return longitude;
     }
 
-    public void setPosition(PositionModel position) {
-        this.position = position;
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
+    }
+
+    public double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
     }
 }
